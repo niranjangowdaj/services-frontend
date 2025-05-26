@@ -6,6 +6,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Service from './pages/Service';
 import AddService from './pages/AddService';
+import Profile from './pages/Profile';
 import Modal from './components/Modal';
 import './styles/theme.css';
 import './styles/App.css';
@@ -13,7 +14,15 @@ import './styles/App.css';
 interface User {
   id: number;
   email: string;
+  name: string;
   role: 'user' | 'admin';
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
 }
 
 const App: React.FC = () => {
@@ -58,6 +67,16 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home user={user} onLogin={handleLogin} />} />
             <Route path="/services/:id" element={<Service user={user} />} />
+            <Route
+              path="/profile"
+              element={
+                user ? (
+                  <Profile user={user} />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
             <Route
               path="/add-service"
               element={

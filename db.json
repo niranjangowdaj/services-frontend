@@ -191,20 +191,101 @@
         "name": "Ahmedabad Renovations",
         "avatar": "https://randomuser.me/api/portraits/men/8.jpg"
       }
+    },
+    {
+      "id": "9",
+      "name": "Premium Home Services",
+      "description": "This is a comprehensive home service that offers a wide range of services including but not limited to deep cleaning, maintenance, repairs, renovations, landscaping, interior design consulting, and much more to test the text truncation feature and ensure it works properly on all devices and screen sizes.",
+      "price": 15000,
+      "rating": 4.8,
+      "reviews": 123,
+      "location": "Mumbai",
+      "type": "Other",
+      "image": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+      "phone": "+91 98765 43218",
+      "features": [
+        "Comprehensive Services",
+        "Professional Team",
+        "Quality Assurance",
+        "Flexible Scheduling",
+        "Customer Support"
+      ],
+      "provider": {
+        "id": "109",
+        "name": "Premium Home Services Provider with a Very Long Name",
+        "avatar": "https://randomuser.me/api/portraits/men/9.jpg"
+      }
     }
   ],
   "users": [
     {
       "id": 1,
+      "name": "Admin User",
       "email": "admin@example.com",
       "password": "admin123",
-      "role": "admin"
+      "role": "admin",
+      "address": {
+        "street": "123 Admin Street",
+        "city": "Mumbai",
+        "state": "Maharashtra",
+        "zipCode": "400001",
+        "country": "India"
+      }
     },
     {
       "id": 2,
+      "name": "John Doe",
       "email": "user@example.com",
       "password": "user123",
-      "role": "user"
+      "role": "user",
+      "address": {
+        "street": "456 User Avenue",
+        "city": "Delhi",
+        "state": "Delhi",
+        "zipCode": "110001",
+        "country": "India"
+      }
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "userId": 2,
+      "serviceId": "1",
+      "rating": 5,
+      "status": "completed",
+      "orderDate": "2024-01-15T10:30:00Z",
+      "scheduledDate": "2024-01-20T09:00:00Z"
+    },
+    {
+      "id": "2",
+      "userId": 2,
+      "serviceId": "3",
+      "rating": 4,
+      "status": "in-progress",
+      "orderDate": "2024-01-10T14:15:00Z",
+      "scheduledDate": "2024-01-25T11:00:00Z"
+    },
+    {
+      "id": "3",
+      "userId": 1,
+      "serviceId": "2",
+      "rating": null,
+      "status": "pending",
+      "orderDate": "2024-01-05T16:45:00Z",
+      "scheduledDate": "2024-01-30T08:30:00Z"
+    },
+    {
+      "id": "4",
+      "userId": "2",
+      "serviceId": "9",
+      "serviceName": "Premium Comprehensive Home Services with Extended Description Testing",
+      "servicePrice": 15000,
+      "orderDate": "2024-01-15",
+      "status": "completed",
+      "scheduledDate": "2024-01-20",
+      "providerName": "Premium Home Services Provider with a Very Long Name",
+      "providerPhone": "+91 98765 43218"
     }
   ]
 } 

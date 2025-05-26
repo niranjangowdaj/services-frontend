@@ -110,6 +110,13 @@
   min-height: 3.6rem;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.5;
+  word-wrap: break-word;
 }
 
 .service-card p {
@@ -122,6 +129,9 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+  word-wrap: break-word;
 }
 
 .service-meta {
@@ -190,5 +200,17 @@
 
   .services-grid {
     grid-template-columns: 1fr;
+  }
+
+  .service-card h2 {
+    font-size: 1.1rem;
+    min-height: 3rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .service-card p {
+    font-size: 0.85rem;
+    min-height: 2.4rem;
+    -webkit-line-clamp: 2;
   }
 } 
