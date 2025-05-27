@@ -4,82 +4,122 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  position: relative;
+  width: calc(100% - 40px);
+  max-width: 460px;
+  max-height: calc(90vh - 40px);
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+  background: none;
+  padding: 0;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-content {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
   position: relative;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
+  border: none;
+  backdrop-filter: none;
+  display: block;
 }
 
 .modal-close {
   position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
-  background: none;
-  border: none;
-  font-size: 1.5rem;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  font-size: 1.2rem;
   cursor: pointer;
-  color: var(--text-color);
-  padding: var(--spacing-xs);
+  color: var(--white);
   line-height: 1;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
 }
 
 .modal-close:hover {
-  color: var(--primary-color);
+  background: var(--error-color);
+  color: var(--white);
+  border-color: var(--error-color);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
 }
 
-/* Fix input field alignment */
+/* Remove any conflicting styles for form elements inside modal */
 .modal-content .form-group {
-  margin-bottom: var(--spacing-md);
-  width: 100%;
-  max-width: 400px;
+  margin-bottom: inherit;
 }
 
 .modal-content .form-group input {
-  width: 100%;
-  box-sizing: border-box;
-  text-align: center;
+  width: 90%;
+  box-sizing: inherit;
+  text-align: inherit;
 }
 
 .modal-content .submit-button {
-  width: 100%;
-  max-width: 400px;
-  box-sizing: border-box;
+  width: auto;
+  max-width: none;
+  box-sizing: inherit;
 }
 
 .modal-content h2,
 .modal-content p {
-  text-align: center;
-  width: 100%;
+  text-align: inherit;
+  width: auto;
 }
 
 .modal-content .error-message {
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+  width: auto;
+  max-width: none;
+  text-align: inherit;
 }
 
-.modal-content .sign-up-link {
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+.modal-content .sign-up-link,
+.modal-content .sign-in-link {
+  width: auto;
+  max-width: none;
+  text-align: inherit;
 } 

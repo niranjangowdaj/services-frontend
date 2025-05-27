@@ -2,47 +2,61 @@
   max-width: 800px;
   margin: 0 auto;
   padding: var(--spacing-lg);
+  min-height: calc(100vh - 64px);
+  background-color: var(--background-color);
 }
 
 .add-service-page h1 {
-  color: var(--primary-color);
-  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xl);
   text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
 }
 
 .add-service-form {
-  background-color: var(--surface-color);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-md);
-  box-shadow: var(--shadow-md);
+  background-color: var(--card-background);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color);
 }
 
 .form-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius);
   font-size: 1rem;
-  color: var(--text-primary);
-  background-color: var(--surface-color);
+  color: var(--text-color);
+  background-color: var(--background-color-light);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-color-light);
 }
 
 .form-group textarea {
-  min-height: 100px;
+  min-height: 120px;
   resize: vertical;
+  font-family: inherit;
 }
 
 .form-group input:focus,
@@ -50,7 +64,27 @@
 .form-group select:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px var(--primary-light);
+  background-color: var(--background-color-lighter);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.form-group select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e2e8f0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-md) center;
+  background-size: 1em;
+  padding-right: calc(var(--spacing-md) + 2em);
+}
+
+.error-message {
+  background-color: var(--error-color);
+  color: var(--white);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+  font-weight: 500;
 }
 
 .feature-input {
@@ -66,15 +100,17 @@
 .feature-input button {
   padding: var(--spacing-sm) var(--spacing-md);
   background-color: var(--primary-color);
-  color: white;
+  color: var(--white);
   border: none;
-  border-radius: var(--border-radius-sm);
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .feature-input button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--primary-color-dark);
+  transform: translateY(-1px);
 }
 
 .features-list {
@@ -87,10 +123,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm);
-  background-color: var(--background-color);
-  border-radius: var(--border-radius-sm);
-  margin-bottom: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background-color: var(--background-color-lighter);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
 }
 
 .features-list li button {
@@ -99,28 +137,54 @@
   color: var(--error-color);
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 0 var(--spacing-xs);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+}
+
+.features-list li button:hover {
+  background-color: var(--error-color);
+  color: var(--white);
 }
 
 .submit-button {
   width: 100%;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background-color: var(--primary-color);
-  color: white;
+  color: var(--white);
   border: none;
-  border-radius: var(--border-radius-sm);
-  font-size: 1rem;
-  font-weight: 500;
+  border-radius: var(--border-radius);
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: var(--spacing-md);
+  transition: all 0.2s ease;
+  margin-top: var(--spacing-lg);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .submit-button:hover {
-  background-color: var(--primary-dark);
+  background-color: var(--primary-color-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--box-shadow-lg);
 }
 
 .submit-button:disabled {
-  background-color: var(--border-color);
+  background-color: var(--text-color-light);
   cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .add-service-page {
+    padding: var(--spacing-md);
+  }
+  
+  .add-service-form {
+    padding: var(--spacing-lg);
+  }
+  
+  .add-service-page h1 {
+    font-size: 2rem;
+  }
 } 

@@ -178,7 +178,6 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
       <Modal
         isOpen={isSignInModalOpen}
         onClose={() => setIsSignInModalOpen(false)}
-        title="Sign In"
       >
         <SignIn onLogin={onLogin} onSignUpClick={() => {
           setIsSignInModalOpen(false);

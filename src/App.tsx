@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import TopBar from './components/TopBar';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
@@ -13,8 +13,8 @@ import './styles/App.css';
 
 interface User {
   id: number;
-  email: string;
   name: string;
+  email: string;
   role: 'user' | 'admin';
   address: {
     street: string;
@@ -25,10 +25,13 @@ interface User {
   };
 }
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
+  const [isAdminSignUpModalOpen, setIsAdminSignUpModalOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is logged in
@@ -37,6 +40,16 @@ const App: React.FC = () => {
       setUser(JSON.parse(storedUser));
     }
   }, []);
+
+  useEffect(() => {
+    // Check for admin signup URL
+    if (location.pathname === '/adminSignup') {
+      console.log('admin');
+      setIsAdminSignUpModalOpen(true);
+      // Navigate back to home
+      navigate('/', { replace: true });
+    }
+  }, [location.pathname, navigate]);
 
   const handleLogin = (userData: User) => {
     setUser(userData);
@@ -55,69 +68,95 @@ const App: React.FC = () => {
     setIsSignUpModalOpen(false);
   };
 
+  const handleAdminSignUpSuccess = (userData: User) => {
+    // Force role to admin for admin signup
+    const adminUser = { ...userData, role: 'admin' as const };
+    setUser(adminUser);
+    localStorage.setItem('user', JSON.stringify(adminUser));
+    setIsAdminSignUpModalOpen(false);
+  };
+
+  return (
+    <div className="app">
+      <TopBar 
+        user={user} 
+        onLogout={handleLogout} 
+        onSignInClick={() => setIsSignInModalOpen(true)}
+      />
+      <main className="main-content">
+        <Routes>
+          <Route path="/" element={<Home user={user} onLogin={handleLogin} />} />
+          <Route path="/services/:id" element={<Service user={user} />} />
+          <Route
+            path="/profile"
+            element={
+              user ? (
+                <Profile user={user} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+          <Route
+            path="/add-service"
+            element={
+              user?.role === 'admin' ? (
+                <AddService user={user} />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+        </Routes>
+      </main>
+
+      <Modal 
+        isOpen={isSignInModalOpen} 
+        onClose={() => setIsSignInModalOpen(false)}
+      >
+        <SignIn 
+          onLogin={handleLogin} 
+          onSignUpClick={() => {
+            setIsSignInModalOpen(false);
+            setIsSignUpModalOpen(true);
+          }}
+        />
+      </Modal>
+
+      <Modal 
+        isOpen={isSignUpModalOpen} 
+        onClose={() => setIsSignUpModalOpen(false)}
+      >
+        <SignUp 
+          onSignUp={handleSignUpSuccess}
+          onSignInClick={() => {
+            setIsSignUpModalOpen(false);
+            setIsSignInModalOpen(true);
+          }}
+        />
+      </Modal>
+
+      <Modal 
+        isOpen={isAdminSignUpModalOpen} 
+        onClose={() => setIsAdminSignUpModalOpen(false)}
+      >
+        <SignUp 
+          onSignUp={handleAdminSignUpSuccess}
+          onSignInClick={() => {
+            setIsAdminSignUpModalOpen(false);
+            setIsSignInModalOpen(true);
+          }}
+          isAdminSignUp={true}
+        />
+      </Modal>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
   return (
     <Router>
-      <div className="app">
-        <TopBar 
-          user={user} 
-          onLogout={handleLogout} 
-          onSignInClick={() => setIsSignInModalOpen(true)}
-        />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<Home user={user} onLogin={handleLogin} />} />
-            <Route path="/services/:id" element={<Service user={user} />} />
-            <Route
-              path="/profile"
-              element={
-                user ? (
-                  <Profile user={user} />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-            <Route
-              path="/add-service"
-              element={
-                user?.role === 'admin' ? (
-                  <AddService user={user} />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
-          </Routes>
-        </main>
-
-        <Modal 
-          isOpen={isSignInModalOpen} 
-          onClose={() => setIsSignInModalOpen(false)}
-          title="Sign In"
-        >
-          <SignIn 
-            onLogin={handleLogin} 
-            onSignUpClick={() => {
-              setIsSignInModalOpen(false);
-              setIsSignUpModalOpen(true);
-            }}
-          />
-        </Modal>
-
-        <Modal 
-          isOpen={isSignUpModalOpen} 
-          onClose={() => setIsSignUpModalOpen(false)}
-          title="Sign Up"
-        >
-          <SignUp 
-            onSignUp={handleSignUpSuccess}
-            onSignInClick={() => {
-              setIsSignUpModalOpen(false);
-              setIsSignInModalOpen(true);
-            }}
-          />
-        </Modal>
-      </div>
+      <AppContent />
     </Router>
   );
 };

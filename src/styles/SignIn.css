@@ -8,13 +8,18 @@
 }
 
 .sign-in-container {
-  width: 100%;
-  max-width: 400px;
+  background: rgba(45, 55, 75, 0.95);
+  backdrop-filter: blur(20px);
   padding: var(--spacing-xl);
-  background-color: var(--card-background);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  box-sizing: border-box;
 }
 
 .sign-in-header {
@@ -24,13 +29,13 @@
 
 .sign-in-header h2 {
   margin: 0 0 var(--spacing-xs);
-  color: var(--text-primary);
+  color: var(--white);
   font-size: 2rem;
   font-weight: 600;
 }
 
 .sign-in-subtitle {
-  color: var(--text-color-light);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 1rem;
   margin: 0;
 }
@@ -46,67 +51,92 @@
 }
 
 .sign-in-form {
-  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 .form-group {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  max-width: 400px;
+  text-align: left;
 }
 
 .form-group label {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
-  color: var(--text-color);
-  font-size: 0.9rem;
+  justify-content: center;
+  margin-bottom: var(--spacing-sm);
   font-weight: 500;
+  color: var(--white);
+  font-size: 0.95rem;
 }
 
 .input-icon {
-  color: var(--primary-color);
+  margin-right: 8px;
+  color: var(--accent-color);
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .form-group input {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border: 1px solid var(--border-color);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--border-radius);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--white);
   font-size: 1rem;
-  transition: all 0.2s ease;
-  background-color: var(--background-color-light);
-  color: var(--text-color);
+  transition: all 0.3s ease;
   box-sizing: border-box;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--primary-color);
-  background-color: var(--background-color-lighter);
-  box-shadow: 0 0 0 2px var(--primary-color-light);
+  border-color: var(--accent-color);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  opacity: 1;
+}
+
+.form-group input::-webkit-input-placeholder {
   color: var(--text-color-light);
+  opacity: 0.8;
+}
+
+.form-group input::-moz-placeholder {
+  color: var(--text-color-light);
+  opacity: 0.8;
+}
+
+.form-group input:-ms-input-placeholder {
+  color: var(--text-color-light);
+  opacity: 0.8;
 }
 
 .submit-button {
   width: 100%;
-  padding: var(--spacing-sm) var(--spacing-md);
-  background-color: var(--primary-color);
+  max-width: 400px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   color: var(--white);
   border: none;
   border-radius: var(--border-radius);
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: var(--spacing-md);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
 }
 
 .submit-button:hover {
@@ -119,19 +149,21 @@
 }
 
 .button-icon {
-  font-size: 1rem;
+  margin-right: 4px;
+  font-size: 0.9rem;
 }
 
 .sign-up-link {
   text-align: center;
-  color: var(--text-color-light);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
+  margin-top: var(--spacing-md);
 }
 
 .link-button {
   background: none;
   border: none;
-  color: var(--primary-color);
+  color: var(--accent-color);
   font-weight: 500;
   cursor: pointer;
   padding: 0;
@@ -141,7 +173,7 @@
 }
 
 .link-button:hover {
-  color: var(--primary-color-light);
+  color: var(--primary-color);
   text-decoration: underline;
 }
 

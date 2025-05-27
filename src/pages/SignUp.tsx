@@ -6,9 +6,10 @@ import '../styles/SignUp.css';
 interface SignUpProps {
   onSignUp: (user: any) => void;
   onSignInClick: () => void;
+  isAdminSignUp?: boolean;
 }
 
-const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick }) => {
+const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp = false }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -74,8 +75,10 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick }) => {
   return (
     <div className="sign-up-container">
       <div className="sign-up-header">
-        <h2>Create Account</h2>
-        <p className="sign-up-subtitle">Join us to get started</p>
+        <h2>{isAdminSignUp ? 'Create Admin Account' : 'Create Account'}</h2>
+        <p className="sign-up-subtitle">
+          {isAdminSignUp ? 'Join as an administrator' : 'Join us to get started'}
+        </p>
       </div>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit} className="sign-up-form">
