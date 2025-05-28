@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaPhone, FaMapMarkerAlt, FaBroom, FaWrench, FaBolt, FaPaintBrush, FaHammer, FaLeaf, FaTruck } from 'react-icons/fa';
 import { ServiceType, Location } from '../types/enums';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import Modal from '../components/Modal';
 import SignIn from './SignIn';
 import '../styles/Home.css';
@@ -55,7 +56,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await fetch('http://localhost:3001/services');
+        const response = await apiRequest(API_ENDPOINTS.services);
         if (!response.ok) {
           throw new Error('Failed to fetch services');
         }

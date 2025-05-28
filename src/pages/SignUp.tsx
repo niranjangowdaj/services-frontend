@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FaUser, FaLock, FaEnvelope, FaUserPlus } from 'react-icons/fa';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/SignUp.css';
 
 interface SignUpProps {
@@ -11,12 +11,13 @@ interface SignUpProps {
 
 const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp = false }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,40 +36,58 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
       return;
     }
 
-    try {
-      const response = await fetch(API_ENDPOINTS.users);
-      const users = await response.json();
-      
-      const existingUser = users.find((u: any) => u.email === formData.email);
-      if (existingUser) {
-        setError('Email already exists');
-        return;
-      }
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
 
-      const newUser = {
-        id: users.length + 1,
-        name: formData.name,
+    setIsLoading(true);
+
+    try {
+      // Register user with backend
+      const registrationData = {
+        username: formData.username,
         email: formData.email,
         password: formData.password,
-        role: 'user'
+        role: isAdminSignUp ? 'ADMIN' : 'USER'
       };
 
-      const createResponse = await fetch(API_ENDPOINTS.users, {
+      const response = await apiRequest(API_ENDPOINTS.auth.register, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify(registrationData),
       });
 
-      if (createResponse.ok) {
-        onSignUp(newUser);
-      } else {
-        setError('Failed to create account');
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Registration failed');
       }
-    } catch (error) {
+
+      const userData = await response.json();
+
+      // Transform user data to match frontend interface
+      const user = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: userData.role.toLowerCase(), // Convert 'USER'/'ADMIN' to 'user'/'admin'
+        address: userData.address || {
+          street: '',
+          city: '',
+          state: '',
+          zipCode: '',
+          country: ''
+        }
+      };
+
+      onSignUp(user);
+    } catch (error: any) {
       console.error('Error signing up:', error);
-      setError('An error occurred while signing up');
+      setError(error.message || 'An error occurred while signing up');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,18 +102,21 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit} className="sign-up-form">
         <div className="form-group">
-          <label htmlFor="name">
+          <label htmlFor="username">
             <FaUser className="input-icon" />
-            Full Name
+            Username
           </label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={formData.name}
+            id="username"
+            name="username"
+            value={formData.username}
             onChange={handleInputChange}
-            placeholder="Enter your full name"
+            placeholder="Choose a username"
             required
+            disabled={isLoading}
+            minLength={3}
+            maxLength={50}
           />
         </div>
         <div className="form-group">
@@ -110,6 +132,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
             onChange={handleInputChange}
             placeholder="Enter your email"
             required
+            disabled={isLoading}
           />
         </div>
         <div className="form-group">
@@ -123,8 +146,10 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
             name="password"
             value={formData.password}
             onChange={handleInputChange}
-            placeholder="Create a password"
+            placeholder="Create a password (min 6 characters)"
             required
+            disabled={isLoading}
+            minLength={6}
           />
         </div>
         <div className="form-group">
@@ -140,16 +165,17 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
             onChange={handleInputChange}
             placeholder="Confirm your password"
             required
+            disabled={isLoading}
           />
         </div>
-        <button type="submit" className="submit-button">
+        <button type="submit" className="submit-button" disabled={isLoading}>
           <FaUserPlus className="button-icon" />
-          Create Account
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </button>
       </form>
       <div className="sign-in-link">
         Already have an account?
-        <button onClick={onSignInClick} className="link-button">
+        <button onClick={onSignInClick} className="link-button" disabled={isLoading}>
           Sign In
         </button>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaUser, FaMapMarkerAlt, FaPhone, FaCalendarAlt, FaStar, FaClock, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/Profile.css';
 
 interface User {
@@ -62,7 +62,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       // Check if user data is incomplete (missing address)
       if (!user.address) {
         try {
-          const response = await fetch(`http://localhost:3001/users/${user.id}`);
+          const response = await apiRequest(`${API_ENDPOINTS.users}/${user.id}`);
           if (response.ok) {
             const userData = await response.json();
             setCompleteUser(userData);
@@ -80,7 +80,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       
       try {
         // Fetch orders
-        const ordersResponse = await fetch('http://localhost:3001/orders');
+        const ordersResponse = await apiRequest(API_ENDPOINTS.orders);
         if (!ordersResponse.ok) {
           throw new Error('Failed to fetch orders');
         }
@@ -88,7 +88,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         const userOrders = allOrders.filter((order: Order) => order.userId === user.id);
 
         // Fetch services
-        const servicesResponse = await fetch('http://localhost:3001/services');
+        const servicesResponse = await apiRequest(API_ENDPOINTS.services);
         if (!servicesResponse.ok) {
           throw new Error('Failed to fetch services');
         }

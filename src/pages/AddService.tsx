@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_ENDPOINTS } from '../config/api';
 import { ServiceType, Location } from '../types/enums';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/AddService.css';
 
 interface AddServiceProps {
@@ -35,7 +35,7 @@ const AddService: React.FC<AddServiceProps> = ({ user }) => {
     setError('');
 
     try {
-      const response = await fetch(API_ENDPOINTS.services, {
+      const response = await apiRequest(API_ENDPOINTS.services, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

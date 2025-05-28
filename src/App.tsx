@@ -8,6 +8,7 @@ import Service from './pages/Service';
 import AddService from './pages/AddService';
 import Profile from './pages/Profile';
 import Modal from './components/Modal';
+import { setGlobalSignInHandler, setGlobalNavigateToHome } from './config/api';
 import './styles/theme.css';
 import './styles/App.css';
 
@@ -36,10 +37,28 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     // Check if user is logged in
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const jwtToken = localStorage.getItem('jwt_token');
+    
+    if (storedUser && jwtToken) {
       setUser(JSON.parse(storedUser));
+    } else {
+      // Clear any invalid/incomplete authentication data
+      localStorage.removeItem('user');
+      localStorage.removeItem('jwt_token');
     }
   }, []);
+
+  useEffect(() => {
+    // Set up global 403 handler
+    setGlobalSignInHandler(() => {
+      setIsSignInModalOpen(true);
+    });
+    
+    // Set up global navigation handler
+    setGlobalNavigateToHome(() => {
+      navigate('/');
+    });
+  }, [navigate]);
 
   useEffect(() => {
     // Check for admin signup URL
@@ -60,6 +79,7 @@ const AppContent: React.FC = () => {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem('user');
+    localStorage.removeItem('jwt_token');
   };
 
   const handleSignUpSuccess = (userData: User) => {

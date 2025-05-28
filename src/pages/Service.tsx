@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar, FaPhone, FaTrash, FaEdit } from 'react-icons/fa';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/Service.css';
 
 interface User {
@@ -39,7 +39,7 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
 
   const fetchService = async () => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.services}/${id}`);
+      const response = await apiRequest(`${API_ENDPOINTS.services}/${id}`);
       const data = await response.json();
       setService(data);
     } catch (error) {
@@ -50,7 +50,7 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this service?')) {
       try {
-        await fetch(`${API_ENDPOINTS.services}/${id}`, {
+        await apiRequest(`${API_ENDPOINTS.services}/${id}`, {
           method: 'DELETE',
         });
         navigate('/');

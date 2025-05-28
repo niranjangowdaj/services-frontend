@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar, FaPhone, FaMapMarkerAlt, FaUser, FaEdit, FaTrash } from 'react-icons/fa';
 import { Service as ServiceType } from '../types';
 import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/Service.css';
 
 const Service: React.FC = () => {
@@ -17,7 +17,7 @@ const Service: React.FC = () => {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.service(id!));
+        const response = await apiRequest(API_ENDPOINTS.service(id!));
         if (!response.ok) {
           throw new Error('Service not found');
         }
@@ -43,7 +43,7 @@ const Service: React.FC = () => {
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.service(id!), {
+      const response = await apiRequest(API_ENDPOINTS.service(id!), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${user?.token}`
