@@ -184,100 +184,127 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         </div>
 
         <div className="profile-content">
-          <div className="profile-section">
-            <h2>
-              <FaMapMarkerAlt className="section-icon" />
-              Address Information
-            </h2>
-            <div className="address-card">
-              {currentUser.address ? (
-                <>
-                  <p>{currentUser.address.street}</p>
-                  <p>{currentUser.address.city}, {currentUser.address.state} {currentUser.address.zipCode}</p>
-                  <p>{currentUser.address.country}</p>
-                </>
-              ) : (
-                <p>Address information not available</p>
-              )}
-            </div>
-          </div>
-
-          <div className="profile-section">
-            <h2>
-              <FaCalendarAlt className="section-icon" />
-              Order History ({orders.length})
-            </h2>
-            {error && <div className="error-message">{error}</div>}
-            {orders.length === 0 ? (
-              <div className="no-orders">
-                <p>No orders found. Start exploring our services!</p>
+          {currentUser.role !== 'admin' && (
+            <div className="profile-section">
+              <h2>
+                <FaMapMarkerAlt className="section-icon" />
+                Address Information
+              </h2>
+              <div className="address-card">
+                {currentUser.address ? (
+                  <>
+                    <p>{currentUser.address.street}</p>
+                    <p>{currentUser.address.city}, {currentUser.address.state} {currentUser.address.zipCode}</p>
+                    <p>{currentUser.address.country}</p>
+                  </>
+                ) : (
+                  <p>Address information not available</p>
+                )}
               </div>
-            ) : (
-              <div className="orders-list">
-                {orders.map(order => (
-                  <div key={order.id} className="order-card">
-                    <div className="order-header">
-                      <div className="order-info">
-                        <h3>{order.service.name}</h3>
-                        <p className="order-id">Order #{order.id}</p>
-                      </div>
-                      <div className="order-status">
-                        {getStatusIcon(order.status)}
-                        <span className={getStatusClass(order.status)}>
-                          {order.status.replace('-', ' ').toUpperCase()}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="order-details">
-                      <div className="order-detail-item">
-                        <span className="label">Provider:</span>
-                        <span className="value">{order.service.provider.name}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Phone:</span>
-                        <span className="value">{order.service.phone}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Location:</span>
-                        <span className="value">{order.service.location}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Service Type:</span>
-                        <span className="value">{order.service.type}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Order Date:</span>
-                        <span className="value">{formatDate(order.orderDate)}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Scheduled:</span>
-                        <span className="value">{formatDate(order.scheduledDate)}</span>
-                      </div>
-                      <div className="order-detail-item">
-                        <span className="label">Price:</span>
-                        <span className="value price">{formatPrice(order.service.price)}</span>
-                      </div>
-                      {order.rating && (
-                        <div className="order-detail-item">
-                          <span className="label">Your Rating:</span>
-                          <span className="value rating">
-                            {Array.from({ length: 5 }, (_, i) => (
-                              <FaStar 
-                                key={i} 
-                                className={i < order.rating! ? 'star filled' : 'star'} 
-                              />
-                            ))}
-                            <span className="rating-number">({order.rating}/5)</span>
+            </div>
+          )}
+
+          {currentUser.role !== 'admin' && (
+            <div className="profile-section">
+              <h2>
+                <FaCalendarAlt className="section-icon" />
+                Order History ({orders.length})
+              </h2>
+              {error && <div className="error-message">{error}</div>}
+              {orders.length === 0 ? (
+                <div className="no-orders">
+                  <p>No orders found. Start exploring our services!</p>
+                </div>
+              ) : (
+                <div className="orders-list">
+                  {orders.map(order => (
+                    <div key={order.id} className="order-card">
+                      <div className="order-header">
+                        <div className="order-info">
+                          <h3>{order.service.name}</h3>
+                          <p className="order-id">Order #{order.id}</p>
+                        </div>
+                        <div className="order-status">
+                          {getStatusIcon(order.status)}
+                          <span className={getStatusClass(order.status)}>
+                            {order.status.replace('-', ' ').toUpperCase()}
                           </span>
                         </div>
-                      )}
+                      </div>
+                      
+                      <div className="order-details">
+                        <div className="order-detail-item">
+                          <span className="label">Provider:</span>
+                          <span className="value">{order.service.provider.name}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Phone:</span>
+                          <span className="value">{order.service.phone}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Location:</span>
+                          <span className="value">{order.service.location}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Service Type:</span>
+                          <span className="value">{order.service.type}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Order Date:</span>
+                          <span className="value">{formatDate(order.orderDate)}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Scheduled:</span>
+                          <span className="value">{formatDate(order.scheduledDate)}</span>
+                        </div>
+                        <div className="order-detail-item">
+                          <span className="label">Price:</span>
+                          <span className="value price">{formatPrice(order.service.price)}</span>
+                        </div>
+                        {order.rating && (
+                          <div className="order-detail-item">
+                            <span className="label">Your Rating:</span>
+                            <span className="value rating">
+                              {Array.from({ length: 5 }, (_, i) => (
+                                <FaStar 
+                                  key={i} 
+                                  className={i < order.rating! ? 'star filled' : 'star'} 
+                                />
+                              ))}
+                              <span className="rating-number">({order.rating}/5)</span>
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentUser.role === 'admin' && (
+            <div className="profile-section">
+              <h2>Admin Dashboard</h2>
+              <div className="admin-info">
+                <p>We can develop an admin panel to manage ( not developed yet because out of scope for assignment)</p>
+                <div className="admin-features">
+                  <div className="admin-feature">
+                    <h3>Service Management</h3>
+                    <p>Add, edit, and manage services on the platform</p>
                   </div>
-                ))}
+                  <div className="admin-feature">
+                    <h3>User Management</h3>
+                    <p>Monitor and manage user accounts and activities</p>
+                  </div>
+                  <div className="admin-feature">
+                    <h3>System Overview</h3>
+                    <p>Access platform analytics and system status</p>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

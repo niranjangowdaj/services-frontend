@@ -30,7 +30,6 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onSignUpClick }) => {
     setIsLoading(true);
 
     try {
-      // Step 1: Authenticate and get JWT token
       const loginResponse = await apiRequest(API_ENDPOINTS.auth.login, {
         method: 'POST',
         headers: {
@@ -49,10 +48,8 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onSignUpClick }) => {
 
       const authData = await loginResponse.json();
       
-      // Step 2: Store JWT token
       localStorage.setItem('jwt_token', authData.token);
       
-      // Step 3: Fetch user details using the username
       const userResponse = await apiRequest(`${API_ENDPOINTS.users}/username/${authData.username}`);
       
       if (!userResponse.ok) {
@@ -61,12 +58,11 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onSignUpClick }) => {
 
       const userData = await userResponse.json();
       
-      // Step 4: Transform user data to match frontend interface
       const user = {
         id: userData.id,
         name: userData.name,
         email: userData.email,
-        role: userData.role.toLowerCase(), // Convert 'USER'/'ADMIN' to 'user'/'admin'
+        role: userData.role.toLowerCase(), 
         address: userData.address || {
           street: '',
           city: '',
@@ -96,7 +92,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onSignUpClick }) => {
         <div className="form-group">
           <label htmlFor="username">
             <FaUser className="input-icon" />
-            Username
+            Email
           </label>
           <input
             type="text"
@@ -104,7 +100,7 @@ const SignIn: React.FC<SignInProps> = ({ onLogin, onSignUpClick }) => {
             name="username"
             value={formData.username}
             onChange={handleInputChange}
-            placeholder="Enter your username"
+            placeholder="Enter your email"
             required
             disabled={isLoading}
           />

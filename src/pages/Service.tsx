@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaStar, FaPhone, FaTrash, FaEdit } from 'react-icons/fa';
+import { FaStar, FaPhone, FaTrash, FaEdit, FaMapMarkerAlt, FaCheck } from 'react-icons/fa';
 import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/Service.css';
 
@@ -16,22 +16,29 @@ interface ServiceProps {
 
 interface ServiceDetails {
   id: number;
-  title: string;
+  name: string;
   description: string;
   image: string;
-  longDescription: string;
   type: string;
   location: string;
-  cost: number;
-  phoneNumber: string;
+  price: number;
+  phone: string;
   rating: number;
+  reviews: number;
   features: string[];
+  provider: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
 }
 
 const Service: React.FC<ServiceProps> = ({ user }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [service, setService] = useState<ServiceDetails | null>(null);
+  const [isBooking, setIsBooking] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   useEffect(() => {
     fetchService();
@@ -44,6 +51,44 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
       setService(data);
     } catch (error) {
       console.error('Error fetching service:', error);
+    }
+  };
+
+  const handleBookService = async () => {
+    if (!user) {
+      // Redirect to sign in if user is not logged in
+      navigate('/');
+      return;
+    }
+
+    setIsBooking(true);
+    try {
+      const orderData = {
+        serviceId: parseInt(id!),
+        scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // Schedule for tomorrow
+      };
+
+      const response = await apiRequest(API_ENDPOINTS.orders, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (response.ok) {
+        setBookingSuccess(true);
+        // Redirect to profile after 2 seconds
+        setTimeout(() => {
+          navigate('/profile');
+        }, 2000);
+      } else {
+        console.error('Failed to book service');
+      }
+    } catch (error) {
+      console.error('Error booking service:', error);
+    } finally {
+      setIsBooking(false);
     }
   };
 
@@ -60,26 +105,96 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
     }
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
+  };
+
   if (!service) {
     return <div className="service-not-found">Service not found</div>;
   }
 
+  if (bookingSuccess) {
+    return (
+      <div className="service-page">
+        <div className="booking-success">
+          <FaCheck className="success-icon" />
+          <h2>Service Booked Successfully!</h2>
+          <p>Your booking has been confirmed. Redirecting to your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="service-page">
-      <div className="service-header">
-        <img src={service.image} alt={service.title} className="service-image" />
-        <div className="service-info">
-          <h1>{service.title}</h1>
-          <p className="service-description">{service.description}</p>
-          <div className="service-meta">
-            <div className="service-rating">
-              <FaStar className="icon" /> {service.rating}
+      <div className="service-container">
+        {/* Service Image */}
+        <div className="service-image-container">
+          <img src={service.image} alt={service.name} className="service-image" />
+        </div>
+
+        {/* Service Header Info */}
+        <div className="service-header-info">
+          <h1 className="service-title">{service.name}</h1>
+          
+          <div className="service-key-details">
+            <div className="detail-item">
+              <div className="detail-icon">
+                <FaStar />
+              </div>
+              <div className="detail-content">
+                <span className="detail-value">{service.rating}</span>
+                <span className="detail-label">({service.reviews} reviews)</span>
+              </div>
             </div>
-            <div className="service-cost">${service.cost}/hr</div>
-            <div className="service-phone">
-              <FaPhone className="icon" /> {service.phoneNumber}
+
+            <div className="detail-item">
+              <div className="detail-icon">
+                ₹
+              </div>
+              <div className="detail-content">
+                <span className="detail-value">{formatPrice(service.price)}</span>
+                <span className="detail-label">per service</span>
+              </div>
+            </div>
+
+            <div className="detail-item">
+              <div className="detail-icon">
+                <FaPhone />
+              </div>
+              <div className="detail-content">
+                <span className="detail-value">{service.phone}</span>
+                <span className="detail-label">Contact</span>
+              </div>
+            </div>
+
+            <div className="detail-item">
+              <div className="detail-icon">
+                <FaMapMarkerAlt />
+              </div>
+              <div className="detail-content">
+                <span className="detail-value">{service.location}</span>
+                <span className="detail-label">Location</span>
+              </div>
             </div>
           </div>
+
+          {/* Book Button */}
+          {user && user.role !== 'admin' && (
+            <button 
+              className="book-button" 
+              onClick={handleBookService}
+              disabled={isBooking}
+            >
+              {isBooking ? 'Booking...' : 'Book Service'}
+            </button>
+          )}
+
+          {/* Admin Controls */}
           {user?.role === 'admin' && (
             <div className="admin-controls">
               <button className="edit-button">
@@ -91,29 +206,40 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
             </div>
           )}
         </div>
-      </div>
-      
-      <div className="service-content">
-        <section className="service-details">
-          <h2>About this Service</h2>
-          <p>{service.longDescription}</p>
-        </section>
 
-        <section className="service-features">
-          <h2>Features</h2>
-          <ul>
-            {service.features.map((feature, index) => (
-              <li key={index}>{feature}</li>
-            ))}
-          </ul>
-        </section>
+        {/* About This Service Section */}
+        <div className="service-about-section">
+          <h2>About This Service</h2>
+          <p className="service-description">{service.description}</p>
+          
+          <div className="service-features">
+            <h3>What's Included</h3>
+            <ul className="features-list">
+              {service.features.map((feature, index) => (
+                <li key={index} className="feature-item">
+                  <FaCheck className="feature-check" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <section className="service-location-info">
-          <h2>Location</h2>
-          <p>{service.location}</p>
-        </section>
-
-        <button className="service-cta">Get Started</button>
+          {/* Provider Info */}
+          <div className="provider-section">
+            <h3>Service Provider</h3>
+            <div className="provider-info">
+              <img 
+                src={service.provider.avatar} 
+                alt={service.provider.name}
+                className="provider-avatar"
+              />
+              <div className="provider-details">
+                <h4>{service.provider.name}</h4>
+                <p>Professional service provider</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

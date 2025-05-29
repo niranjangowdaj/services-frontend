@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaUser, FaLock, FaEnvelope, FaUserPlus } from 'react-icons/fa';
+import { FaUser, FaLock, FaEnvelope, FaUserPlus, FaCheckCircle } from 'react-icons/fa';
 import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/SignUp.css';
 
@@ -18,6 +18,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,22 +68,8 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
 
       const userData = await response.json();
 
-      // Transform user data to match frontend interface
-      const user = {
-        id: userData.id,
-        name: userData.name,
-        email: userData.email,
-        role: userData.role.toLowerCase(), // Convert 'USER'/'ADMIN' to 'user'/'admin'
-        address: userData.address || {
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: ''
-        }
-      };
-
-      onSignUp(user);
+      // Show success message instead of automatically logging in
+      setIsSuccess(true);
     } catch (error: any) {
       console.error('Error signing up:', error);
       setError(error.message || 'An error occurred while signing up');
@@ -90,6 +77,28 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
       setIsLoading(false);
     }
   };
+
+  // Success view
+  if (isSuccess) {
+    return (
+      <div className="sign-up-container">
+        <div className="success-header">
+          <FaCheckCircle className="success-icon" />
+          <h2>Account Created Successfully!</h2>
+          <p className="success-subtitle">
+            {isAdminSignUp 
+              ? 'Your admin account has been created. Please sign in to continue.'
+              : 'Welcome to E-Services! Please sign in to access your account.'
+            }
+          </p>
+        </div>
+        <button onClick={onSignInClick} className="submit-button">
+          <FaUser className="button-icon" />
+          Sign In Now
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="sign-up-container">
