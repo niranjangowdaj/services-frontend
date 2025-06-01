@@ -53,6 +53,31 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Preselect location based on user's city when user changes
+  useEffect(() => {
+    if (user && user.role === 'user' && user.address && user.address.city) {
+      const userCity = user.address.city.trim().toUpperCase();
+      // Check if user's city matches any of the available locations
+      const availableLocations = Object.values(Location);
+      
+      // First try exact match
+      let matchingLocation = availableLocations.find(location => 
+        location.toUpperCase() === userCity
+      );
+      
+      // If no exact match, try partial match (for cases like "New Delhi" -> "Delhi")
+      if (!matchingLocation) {
+        matchingLocation = availableLocations.find(location => 
+          userCity.includes(location.toUpperCase()) || location.toUpperCase().includes(userCity)
+        );
+      }
+      
+      if (matchingLocation && selectedLocation !== matchingLocation) {
+        setSelectedLocation(matchingLocation);
+      }
+    }
+  }, [user]);
+
   useEffect(() => {
     const fetchServices = async () => {
       try {

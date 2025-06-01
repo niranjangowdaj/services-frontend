@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { FaUser, FaLock, FaEnvelope, FaUserPlus, FaCheckCircle } from 'react-icons/fa';
+import { FaUser, FaLock, FaEnvelope, FaUserPlus, FaCheckCircle, FaMapMarkerAlt } from 'react-icons/fa';
 import { API_ENDPOINTS, apiRequest } from '../config/api';
+import { Location } from '../types/enums';
 import '../styles/SignUp.css';
 
 interface SignUpProps {
@@ -14,13 +15,14 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
     username: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    city: ''
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -42,6 +44,11 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
       return;
     }
 
+    if (!formData.city) {
+      setError('Please select a city');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -50,6 +57,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
         username: formData.username,
         email: formData.email,
         password: formData.password,
+        city: formData.city,
         role: isAdminSignUp ? 'ADMIN' : 'USER'
       };
 
@@ -176,6 +184,28 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
             required
             disabled={isLoading}
           />
+        </div>
+        <div className="form-group">
+          <label htmlFor="city">
+            <FaMapMarkerAlt className="input-icon" />
+            City
+          </label>
+          <select
+            id="city"
+            name="city"
+            value={formData.city}
+            onChange={handleInputChange}
+            required
+            disabled={isLoading}
+            className="city-select"
+          >
+            <option value="">Select your city</option>
+            {Object.values(Location).map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
         </div>
         <button type="submit" className="submit-button" disabled={isLoading}>
           <FaUserPlus className="button-icon" />

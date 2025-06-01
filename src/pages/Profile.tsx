@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaMapMarkerAlt, FaPhone, FaCalendarAlt, FaStar, FaClock, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
+import { FaUser, FaMapMarkerAlt, FaCalendarAlt, FaStar, FaClock, FaCheckCircle, FaHourglassHalf, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 import { API_ENDPOINTS, apiRequest } from '../config/api';
 import '../styles/Profile.css';
 
@@ -9,11 +9,8 @@ interface User {
   email: string;
   role: 'user' | 'admin';
   address: {
-    street: string;
+    address: string;
     city: string;
-    state: string;
-    zipCode: string;
-    country: string;
   };
 }
 
@@ -25,6 +22,7 @@ interface Order {
   status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
   orderDate: string;
   scheduledDate: string;
+  isReviewed: boolean;
 }
 
 interface Service {
@@ -54,54 +52,66 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [completeUser, setCompleteUser] = useState<User | null>(user);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [editedAddress, setEditedAddress] = useState('');
+  const [hoveredRating, setHoveredRating] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     const fetchCompleteUserData = async () => {
       if (!user) return;
       
-      // Check if user data is incomplete (missing address)
-      if (!user.address) {
-        try {
-          const response = await apiRequest(`${API_ENDPOINTS.users}/${user.id}`);
-          if (response.ok) {
-            const userData = await response.json();
-            setCompleteUser(userData);
-            // Update localStorage with complete user data
-            localStorage.setItem('user', JSON.stringify(userData));
-          }
-        } catch (err) {
-          console.error('Error fetching complete user data:', err);
+      try {
+        const response = await apiRequest(`${API_ENDPOINTS.users}/${user.id}`);
+        if (response.ok) {
+          const userData = await response.json();
+          setCompleteUser(userData);
+          // Update localStorage with fresh user data
+          localStorage.setItem('user', JSON.stringify(userData));
         }
+      } catch (err) {
+        console.error('Error fetching complete user data:', err);
       }
     };
 
+    fetchCompleteUserData();
+  }, [user]);
+
+  useEffect(() => {
     const fetchUserOrdersWithServices = async () => {
       if (!user) return;
       
       try {
-        // Fetch orders
-        const ordersResponse = await apiRequest(API_ENDPOINTS.orders);
+        // Fetch user-specific orders from the correct endpoint
+        const ordersResponse = await apiRequest(`${API_ENDPOINTS.orders}/user/${user.id}`);
         if (!ordersResponse.ok) {
           throw new Error('Failed to fetch orders');
         }
-        const allOrders = await ordersResponse.json();
-        const userOrders = allOrders.filter((order: Order) => order.userId === user.id);
+        const userOrdersData = await ordersResponse.json();
 
-        // Fetch services
-        const servicesResponse = await apiRequest(API_ENDPOINTS.services);
-        if (!servicesResponse.ok) {
-          throw new Error('Failed to fetch services');
-        }
-        const services = await servicesResponse.json();
-
-        // Combine orders with service data
-        const ordersWithServices: OrderWithService[] = userOrders.map((order: Order) => {
-          const service = services.find((s: Service) => s.id === order.serviceId);
-          return {
-            ...order,
-            service
-          };
-        }).filter((order: OrderWithService) => order.service); // Remove orders with missing services
+        // The backend already returns orders with service data included
+        const ordersWithServices: OrderWithService[] = userOrdersData.map((orderData: any) => ({
+          id: orderData.id.toString(),
+          userId: orderData.userId,
+          serviceId: orderData.serviceId.toString(),
+          rating: orderData.rating,
+          status: orderData.status.toLowerCase().replace('_', '-'),
+          orderDate: orderData.orderDate,
+          scheduledDate: orderData.scheduledDate,
+          isReviewed: orderData.isReviewed,
+          service: {
+            id: orderData.service.id.toString(),
+            name: orderData.service.name,
+            price: orderData.service.price || orderData.service.cost,
+            location: orderData.service.location,
+            type: orderData.service.category,
+            phone: orderData.service.phone,
+            provider: {
+              id: orderData.service.provider.id,
+              name: orderData.service.provider.name,
+              avatar: orderData.service.provider.avatar
+            }
+          }
+        }));
 
         setOrders(ordersWithServices);
       } catch (err) {
@@ -112,9 +122,179 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
       }
     };
 
-    fetchCompleteUserData();
     fetchUserOrdersWithServices();
   }, [user]);
+
+  const handleEditAddress = () => {
+    setEditedAddress(completeUser?.address?.address || '');
+    setIsEditingAddress(true);
+  };
+
+  const handleSaveAddress = async () => {
+    if (!completeUser) return;
+
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.users}/${completeUser.id}/address`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ address: editedAddress }),
+      });
+
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setCompleteUser(updatedUser);
+        // Update localStorage with the complete updated user data
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setIsEditingAddress(false);
+      } else {
+        setError('Failed to update address');
+      }
+    } catch (err) {
+      setError('Failed to update address');
+      console.error('Error updating address:', err);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditingAddress(false);
+    setEditedAddress('');
+  };
+
+  const handleRatingHover = (orderId: string, rating: number) => {
+    setHoveredRating(prev => ({ ...prev, [orderId]: rating }));
+  };
+
+  const handleRatingLeave = (orderId: string) => {
+    setHoveredRating(prev => {
+      const newState = { ...prev };
+      delete newState[orderId];
+      return newState;
+    });
+  };
+
+  const handleRatingClick = async (orderId: string, rating: number) => {
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.orders}/${orderId}/rating`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ rating }),
+      });
+
+      if (response.ok) {
+        // Update the order in the local state
+        setOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === orderId 
+              ? { ...order, rating, isReviewed: true }
+              : order
+          )
+        );
+        // Clear hover state
+        handleRatingLeave(orderId);
+      } else {
+        setError('Failed to submit rating');
+      }
+    } catch (err) {
+      setError('Failed to submit rating');
+      console.error('Error submitting rating:', err);
+    }
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await apiRequest(`${API_ENDPOINTS.orders}/${orderId}/status?status=${newStatus}`, {
+        method: 'PUT'
+      });
+
+      if (response.ok) {
+        // Refetch orders to get updated data
+        const ordersResponse = await apiRequest(`${API_ENDPOINTS.orders}/user/${user?.id}`);
+        if (ordersResponse.ok) {
+          const userOrdersData = await ordersResponse.json();
+          const ordersWithServices: OrderWithService[] = userOrdersData.map((orderData: any) => ({
+            id: orderData.id.toString(),
+            userId: orderData.userId,
+            serviceId: orderData.serviceId.toString(),
+            rating: orderData.rating,
+            status: orderData.status.toLowerCase().replace('_', '-'),
+            orderDate: orderData.orderDate,
+            scheduledDate: orderData.scheduledDate,
+            isReviewed: orderData.isReviewed,
+            service: {
+              id: orderData.service.id.toString(),
+              name: orderData.service.name,
+              price: orderData.service.price || orderData.service.cost,
+              location: orderData.service.location,
+              type: orderData.service.category,
+              phone: orderData.service.phone,
+              provider: {
+                id: orderData.service.provider.id,
+                name: orderData.service.provider.name,
+                avatar: orderData.service.provider.avatar
+              }
+            }
+          }));
+          setOrders(ordersWithServices);
+        }
+      } else {
+        setError('Failed to update order status');
+      }
+    } catch (err) {
+      setError('Failed to update order status');
+      console.error('Error updating order status:', err);
+    }
+  };
+
+  const renderStars = (order: OrderWithService) => {
+    const orderId = order.id;
+    const currentRating = order.rating || 0;
+    const hovered = hoveredRating[orderId] || 0;
+    const isReviewed = order.isReviewed;
+    const canRate = order.status === 'completed' && !isReviewed;
+
+    return (
+      <div className="rating-stars">
+        {Array.from({ length: 5 }, (_, i) => {
+          const starNumber = i + 1;
+          let isFilled = false;
+          
+          if (canRate) {
+            // If can rate, show hovered stars or current rating
+            isFilled = hovered > 0 ? starNumber <= hovered : starNumber <= currentRating;
+          } else if (isReviewed) {
+            // If already reviewed, show the actual rating
+            isFilled = starNumber <= currentRating;
+          }
+          
+          return (
+            <FaStar
+              key={i}
+              className={`star ${isFilled ? 'filled' : ''} ${canRate ? 'interactive' : ''}`}
+              onMouseEnter={() => canRate && handleRatingHover(orderId, starNumber)}
+              onMouseLeave={() => canRate && handleRatingLeave(orderId)}
+              onClick={() => canRate && handleRatingClick(orderId, starNumber)}
+              style={{
+                cursor: canRate ? 'pointer' : 'default',
+                color: isFilled ? '#fbbf24' : '#d1d5db',
+                fontSize: '1.1rem',
+                transition: 'all 0.2s ease'
+              }}
+            />
+          );
+        })}
+        {isReviewed && currentRating > 0 && (
+          <span className="rating-text">({currentRating}/5)</span>
+        )}
+        {canRate && (
+          <span className="rating-text">Click to rate</span>
+        )}
+      </div>
+    );
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -179,7 +359,15 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           <div className="profile-info">
             <h1>{currentUser.name}</h1>
             <p className="profile-email">{currentUser.email}</p>
-            <span className={`role-badge ${currentUser.role}`}>{currentUser.role}</span>
+            <div className="profile-badges">
+              <span className={`role-badge ${currentUser.role}`}>{currentUser.role}</span>
+              {currentUser.address?.city && (
+                <span className="city-badge">
+                  <FaMapMarkerAlt className="city-icon" />
+                  {currentUser.address.city}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -191,14 +379,45 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
                 Address Information
               </h2>
               <div className="address-card">
-                {currentUser.address ? (
-                  <>
-                    <p>{currentUser.address.street}</p>
-                    <p>{currentUser.address.city}, {currentUser.address.state} {currentUser.address.zipCode}</p>
-                    <p>{currentUser.address.country}</p>
-                  </>
+                {!isEditingAddress ? (
+                  <div className="address-display">
+                    <p className="address-text">
+                      {currentUser.address?.address || 'No address provided'}
+                    </p>
+                    <button 
+                      className="edit-button" 
+                      onClick={handleEditAddress}
+                      title="Edit Address"
+                    >
+                      <FaEdit />
+                    </button>
+                  </div>
                 ) : (
-                  <p>Address information not available</p>
+                  <div className="address-edit">
+                    <textarea
+                      value={editedAddress}
+                      onChange={(e) => setEditedAddress(e.target.value)}
+                      placeholder="Enter your address"
+                      className="address-input"
+                      rows={3}
+                    />
+                    <div className="edit-actions">
+                      <button 
+                        className="save-button" 
+                        onClick={handleSaveAddress}
+                        title="Save Address"
+                      >
+                        <FaSave />
+                      </button>
+                      <button 
+                        className="cancel-button" 
+                        onClick={handleCancelEdit}
+                        title="Cancel"
+                      >
+                        <FaTimes />
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -254,24 +473,33 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
                           <span className="value">{formatDate(order.orderDate)}</span>
                         </div>
                         <div className="order-detail-item">
-                          <span className="label">Scheduled:</span>
-                          <span className="value">{formatDate(order.scheduledDate)}</span>
-                        </div>
-                        <div className="order-detail-item">
                           <span className="label">Price:</span>
                           <span className="value price">{formatPrice(order.service.price)}</span>
                         </div>
-                        {order.rating && (
-                          <div className="order-detail-item">
-                            <span className="label">Your Rating:</span>
-                            <span className="value rating">
-                              {Array.from({ length: 5 }, (_, i) => (
-                                <FaStar 
-                                  key={i} 
-                                  className={i < order.rating! ? 'star filled' : 'star'} 
-                                />
-                              ))}
-                              <span className="rating-number">({order.rating}/5)</span>
+                        <div className="order-detail-item">
+                          <span className="label">Rating:</span>
+                          <span className="value rating">
+                            {renderStars(order)}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Action buttons */}
+                      <div className="order-actions">
+                        {order.status !== 'completed' && (
+                          <button 
+                            className="complete-order-btn"
+                            onClick={() => handleStatusChange(order.id, 'COMPLETED')}
+                            title="Mark order as completed"
+                          >
+                            <FaCheckCircle />
+                            Mark as Completed
+                          </button>
+                        )}
+                        {order.status === 'completed' && !order.isReviewed && (
+                          <div className="rating-prompt">
+                            <span className="rating-prompt-text">
+                              ⭐ Service completed! Please rate your experience above.
                             </span>
                           </div>
                         )}

@@ -197,9 +197,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
           {/* Admin Controls */}
           {user?.role === 'admin' && (
             <div className="admin-controls">
-              <button className="edit-button">
-                <FaEdit className="icon" /> Edit
-              </button>
               <button className="delete-button" onClick={handleDelete}>
                 <FaTrash className="icon" /> Delete
               </button>
