@@ -44,7 +44,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
       return;
     }
 
-    if (!formData.city) {
+    if (!isAdminSignUp && !formData.city) {
       setError('Please select a city');
       return;
     }
@@ -57,7 +57,7 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        city: formData.city,
+        city: isAdminSignUp ? null : formData.city,
         role: isAdminSignUp ? 'ADMIN' : 'USER'
       };
 
@@ -185,28 +185,30 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
             disabled={isLoading}
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="city">
-            <FaMapMarkerAlt className="input-icon" />
-            City
-          </label>
-          <select
-            id="city"
-            name="city"
-            value={formData.city}
-            onChange={handleInputChange}
-            required
-            disabled={isLoading}
-            className="city-select"
-          >
-            <option value="">Select your city</option>
-            {Object.values(Location).map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-        </div>
+        {!isAdminSignUp && (
+          <div className="form-group">
+            <label htmlFor="city">
+              <FaMapMarkerAlt className="input-icon" />
+              City
+            </label>
+            <select
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+              className="city-select"
+            >
+              <option value="">Select your city</option>
+              {Object.values(Location).map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
         <button type="submit" className="submit-button" disabled={isLoading}>
           <FaUserPlus className="button-icon" />
           {isLoading ? 'Creating Account...' : 'Create Account'}

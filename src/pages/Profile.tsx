@@ -372,7 +372,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
         </div>
 
         <div className="profile-content">
-          {currentUser.role !== 'admin' && (
+          {currentUser.role.toLocaleLowerCase() !== 'admin' && (
             <div className="profile-section">
               <h2>
                 <FaMapMarkerAlt className="section-icon" />
@@ -423,7 +423,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             </div>
           )}
 
-          {currentUser.role !== 'admin' && (
+          {currentUser.role.toLocaleLowerCase() !== 'admin' && (
             <div className="profile-section">
               <h2>
                 <FaCalendarAlt className="section-icon" />
@@ -511,7 +511,7 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
             </div>
           )}
 
-          {currentUser.role === 'admin' && (
+          {currentUser.role.toLocaleLowerCase() === 'admin' && (
             <div className="profile-section">
               <h2>Admin Dashboard</h2>
               <div className="admin-info">
