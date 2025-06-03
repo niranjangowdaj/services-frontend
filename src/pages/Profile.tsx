@@ -263,10 +263,8 @@ const Profile: React.FC<ProfileProps> = ({ user }) => {
           let isFilled = false;
           
           if (canRate) {
-            // If can rate, show hovered stars or current rating
             isFilled = hovered > 0 ? starNumber <= hovered : starNumber <= currentRating;
           } else if (isReviewed) {
-            // If already reviewed, show the actual rating
             isFilled = starNumber <= currentRating;
           }
           

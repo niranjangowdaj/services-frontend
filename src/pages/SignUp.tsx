@@ -52,7 +52,6 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
     setIsLoading(true);
 
     try {
-      // Register user with backend
       const registrationData = {
         username: formData.username,
         email: formData.email,
@@ -76,7 +75,6 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
 
       const userData = await response.json();
 
-      // Show success message instead of automatically logging in
       setIsSuccess(true);
     } catch (error: any) {
       console.error('Error signing up:', error);
@@ -86,7 +84,6 @@ const SignUp: React.FC<SignUpProps> = ({ onSignUp, onSignInClick, isAdminSignUp 
     }
   };
 
-  // Success view
   if (isSuccess) {
     return (
       <div className="sign-up-container">

@@ -56,7 +56,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
 
   const handleBookService = async () => {
     if (!user) {
-      // Redirect to sign in if user is not logged in
       navigate('/');
       return;
     }
@@ -65,7 +64,7 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
     try {
       const orderData = {
         serviceId: parseInt(id!),
-        scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // Schedule for tomorrow
+        scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() 
       };
 
       const response = await apiRequest(API_ENDPOINTS.orders, {
@@ -183,7 +182,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
             </div>
           </div>
 
-          {/* Book Button */}
           {user && user.role !== 'admin' && (
             <button 
               className="book-button" 
@@ -194,7 +192,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
             </button>
           )}
 
-          {/* Admin Controls */}
           {user?.role === 'admin' && (
             <div className="admin-controls">
               <button className="delete-button" onClick={handleDelete}>
@@ -204,7 +201,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
           )}
         </div>
 
-        {/* About This Service Section */}
         <div className="service-about-section">
           <h2>About This Service</h2>
           <p className="service-description">{service.description}</p>
@@ -221,7 +217,6 @@ const Service: React.FC<ServiceProps> = ({ user }) => {
             </ul>
           </div>
 
-          {/* Provider Info */}
           <div className="provider-section">
             <h3>Service Provider</h3>
             <div className="provider-info">

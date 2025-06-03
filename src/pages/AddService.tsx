@@ -53,7 +53,7 @@ const AddService: React.FC<AddServiceProps> = ({ user }) => {
           image: formData.image,
           phone: formData.phone,
           providerName: formData.providerName,
-          providerAvatar: '', // Optional field, can be empty
+          providerAvatar: '', 
           features: formData.features.split(',').map(feature => feature.trim()).filter(feature => feature.length > 0)
         })
       });

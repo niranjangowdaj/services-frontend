@@ -48,24 +48,21 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
   const [selectedType, setSelectedType] = useState<ServiceType | ''>('');
   const [selectedLocation, setSelectedLocation] = useState<Location | ''>('');
   const [sortBy, setSortBy] = useState<'price' | 'rating'>('rating');
+  const [searchQuery, setSearchQuery] = useState('');
   const [isSignInModalOpen, setIsSignInModalOpen] = useState(false);
   const [isSignUpModalOpen, setIsSignUpModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Preselect location based on user's city when user changes
   useEffect(() => {
     if (user && user.role === 'user' && user.address && user.address.city) {
       const userCity = user.address.city.trim().toUpperCase();
-      // Check if user's city matches any of the available locations
       const availableLocations = Object.values(Location);
       
-      // First try exact match
       let matchingLocation = availableLocations.find(location => 
         location.toUpperCase() === userCity
       );
       
-      // If no exact match, try partial match (for cases like "New Delhi" -> "Delhi")
       if (!matchingLocation) {
         matchingLocation = availableLocations.find(location => 
           userCity.includes(location.toUpperCase()) || location.toUpperCase().includes(userCity)
@@ -110,6 +107,12 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
       filtered = filtered.filter(service => service.location === selectedLocation);
     }
 
+    if (searchQuery) {
+      filtered = filtered.filter(service => 
+        service.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
     filtered.sort((a, b) => {
       if (sortBy === 'price') {
         return a.price - b.price;
@@ -122,7 +125,7 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
 
   useEffect(() => {
     filterAndSortServices();
-  }, [selectedType, selectedLocation, sortBy, services]);
+  }, [selectedType, selectedLocation, sortBy, services, searchQuery]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -143,6 +146,13 @@ const Home: React.FC<HomeProps> = ({ user, onLogin }) => {
   return (
     <div className="home">
       <div className="filters">
+        <input
+          type="text"
+          placeholder="Search services..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="search-input"
+        />
         <select
           value={selectedType}
           onChange={(e) => setSelectedType(e.target.value as ServiceType | '')}

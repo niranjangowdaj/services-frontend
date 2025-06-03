@@ -13,7 +13,6 @@ export const API_ENDPOINTS = {
   }
 };
 
-// Global 403 error handler
 let globalSignInHandler: (() => void) | null = null;
 let globalNavigateToHome: (() => void) | null = null;
 
@@ -26,18 +25,14 @@ export const setGlobalNavigateToHome = (navigate: () => void) => {
 };
 
 export const apiRequest = async (url: string, options?: RequestInit): Promise<Response> => {
-  // Get JWT token from localStorage
   const token = localStorage.getItem('jwt_token');
   
-  // Prepare headers
   const headers = new Headers(options?.headers);
   
-  // Add JWT token to Authorization header if available
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
   
-  // Add Content-Type if not already set and this is a POST/PUT request
   if (!headers.has('Content-Type') && options?.body) {
     headers.set('Content-Type', 'application/json');
   }
@@ -50,12 +45,10 @@ export const apiRequest = async (url: string, options?: RequestInit): Promise<Re
   const response = await fetch(url, requestOptions);
   
   if (response.status === 403) {
-    // Navigate to home page using React Router
     if (globalNavigateToHome) {
       globalNavigateToHome();
     }
     
-    // Show sign-in modal after a short delay to ensure navigation completes
     setTimeout(() => {
       if (globalSignInHandler) {
         globalSignInHandler();
@@ -63,17 +56,13 @@ export const apiRequest = async (url: string, options?: RequestInit): Promise<Re
     }, 100);
   }
   
-  // Handle 401 Unauthorized (expired/invalid token)
   if (response.status === 401) {
-    // Clear invalid token
     localStorage.removeItem('jwt_token');
     
-    // Navigate to home page
     if (globalNavigateToHome) {
       globalNavigateToHome();
     }
     
-    // Show sign-in modal
     setTimeout(() => {
       if (globalSignInHandler) {
         globalSignInHandler();

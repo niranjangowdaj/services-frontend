@@ -32,37 +32,31 @@ const AppContent: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is logged in
     const storedUser = localStorage.getItem('user');
     const jwtToken = localStorage.getItem('jwt_token');
     
     if (storedUser && jwtToken) {
       setUser(JSON.parse(storedUser));
     } else {
-      // Clear any invalid/incomplete authentication data
       localStorage.removeItem('user');
       localStorage.removeItem('jwt_token');
     }
   }, []);
 
   useEffect(() => {
-    // Set up global 403 handler
     setGlobalSignInHandler(() => {
       setIsSignInModalOpen(true);
     });
     
-    // Set up global navigation handler
     setGlobalNavigateToHome(() => {
       navigate('/');
     });
   }, [navigate]);
 
   useEffect(() => {
-    // Check for admin signup URL
     if (location.pathname === '/adminSignup') {
       console.log('admin');
       setIsAdminSignUpModalOpen(true);
-      // Navigate back to home
       navigate('/', { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -86,7 +80,6 @@ const AppContent: React.FC = () => {
   };
 
   const handleAdminSignUpSuccess = (userData: User) => {
-    // Force role to admin for admin signup
     const adminUser = { ...userData, role: 'admin' as const };
     setUser(adminUser);
     localStorage.setItem('user', JSON.stringify(adminUser));
