@@ -8,6 +8,7 @@ import Service from './pages/Service';
 import AddService from './pages/AddService';
 import Profile from './pages/Profile';
 import Modal from './components/Modal';
+import Analytics from './pages/Analytics';
 import { setGlobalSignInHandler, setGlobalNavigateToHome } from './config/api';
 import './styles/theme.css';
 import './styles/App.css';
@@ -32,31 +33,37 @@ const AppContent: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if user is logged in
     const storedUser = localStorage.getItem('user');
     const jwtToken = localStorage.getItem('jwt_token');
-    
+
     if (storedUser && jwtToken) {
       setUser(JSON.parse(storedUser));
     } else {
+      // Clear any invalid/incomplete authentication data
       localStorage.removeItem('user');
       localStorage.removeItem('jwt_token');
     }
   }, []);
 
   useEffect(() => {
+    // Set up global 403 handler
     setGlobalSignInHandler(() => {
       setIsSignInModalOpen(true);
     });
-    
+
+    // Set up global navigation handler
     setGlobalNavigateToHome(() => {
       navigate('/');
     });
   }, [navigate]);
 
   useEffect(() => {
+    // Check for admin signup URL
     if (location.pathname === '/adminSignup') {
       console.log('admin');
       setIsAdminSignUpModalOpen(true);
+      // Navigate back to home
       navigate('/', { replace: true });
     }
   }, [location.pathname, navigate]);
@@ -80,6 +87,7 @@ const AppContent: React.FC = () => {
   };
 
   const handleAdminSignUpSuccess = (userData: User) => {
+    // Force role to admin for admin signup
     const adminUser = { ...userData, role: 'admin' as const };
     setUser(adminUser);
     localStorage.setItem('user', JSON.stringify(adminUser));
@@ -88,9 +96,9 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="app">
-      <TopBar 
-        user={user} 
-        onLogout={handleLogout} 
+      <TopBar
+        user={user}
+        onLogout={handleLogout}
         onSignInClick={() => setIsSignInModalOpen(true)}
       />
       <main className="main-content">
@@ -117,15 +125,26 @@ const AppContent: React.FC = () => {
               )
             }
           />
+          <Route
+            path="/analytics"
+            element={
+              user?.role === 'admin' ? (
+                <Analytics user={user}/> // this is throwing an error - user find undefined 
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
         </Routes>
+
       </main>
 
-      <Modal 
-        isOpen={isSignInModalOpen} 
+      <Modal
+        isOpen={isSignInModalOpen}
         onClose={() => setIsSignInModalOpen(false)}
       >
-        <SignIn 
-          onLogin={handleLogin} 
+        <SignIn
+          onLogin={handleLogin}
           onSignUpClick={() => {
             setIsSignInModalOpen(false);
             setIsSignUpModalOpen(true);
@@ -133,11 +152,11 @@ const AppContent: React.FC = () => {
         />
       </Modal>
 
-      <Modal 
-        isOpen={isSignUpModalOpen} 
+      <Modal
+        isOpen={isSignUpModalOpen}
         onClose={() => setIsSignUpModalOpen(false)}
       >
-        <SignUp 
+        <SignUp
           onSignUp={handleSignUpSuccess}
           onSignInClick={() => {
             setIsSignUpModalOpen(false);
@@ -146,11 +165,11 @@ const AppContent: React.FC = () => {
         />
       </Modal>
 
-      <Modal 
-        isOpen={isAdminSignUpModalOpen} 
+      <Modal
+        isOpen={isAdminSignUpModalOpen}
         onClose={() => setIsAdminSignUpModalOpen(false)}
       >
-        <SignUp 
+        <SignUp
           onSignUp={handleAdminSignUpSuccess}
           onSignInClick={() => {
             setIsAdminSignUpModalOpen(false);

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaUser, FaUserPlus, FaSignOutAlt, FaUserCircle, FaPlus, FaList } from 'react-icons/fa';
+import { FaUser, FaUserPlus, FaSignOutAlt, FaUserCircle, FaPlus, FaList, FaChartBar } from 'react-icons/fa';
 import '../styles/TopBar.css';
 
 interface TopBarProps {
@@ -43,14 +43,19 @@ const TopBar: React.FC<TopBarProps> = ({ user, onLogout, onSignInClick }) => {
           {user ? (
             <>
               {user.role === 'admin' && (
-                <Link to="/add-service" className="nav-link admin-link">
-                  <FaPlus /> Add Service
-                </Link>
+                <>
+                  <Link to="/add-service" className="nav-link admin-link">
+                    <FaPlus /> Add Service
+                  </Link>
+                  <Link to="/analytics" className="nav-link admin-link">
+                    <FaChartBar /> Analytics
+                  </Link>
+                </>
               )}
               <div className="user-info" ref={dropdownRef}>
                 <span>{user.email}</span>
-                <button 
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="icon-button"
                 >
                   <FaUser />
