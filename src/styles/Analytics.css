@@ -1,0 +1,104 @@
+/* Analytics.css */
+
+.analytics-container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.analytics-header {
+  margin-bottom: 25px;
+  text-align: center;
+  color: #333;
+}
+
+.analytics-header h1 {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.analytics-header p {
+  color: #666;
+  font-size: 1rem;
+}
+
+.analytics-subtitle {
+  color: #007bff;      /* Matches the blue you use in your table header */
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.chart-container {
+  padding: 20px;
+  background-color: #fefefe;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgb(0 123 255 / 0.15);
+  margin-bottom: 40px;
+}
+
+.analytics-summary {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 30px;
+  gap: 15px;
+}
+
+.summary-item {
+  background-color: #f5f7fa;
+  border-radius: 6px;
+  padding: 15px 25px;
+  flex: 1;
+  text-align: center;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.05);
+}
+
+.summary-item h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #007bff;
+}
+
+.summary-item p {
+  margin: 5px 0 0;
+  color: #555;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.analytics-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.analytics-table th,
+.analytics-table td {
+  border: 1px solid #ddd;
+  padding: 10px 15px;
+  text-align: left;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.analytics-table th {
+  background-color: #007bff;
+  color: white;
+  font-weight: 600;
+}
+
+.analytics-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.analytics-table tbody tr:hover {
+  background-color: #e7f1ff;
+  cursor: default;
+}
+
